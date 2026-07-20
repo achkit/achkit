@@ -56,6 +56,40 @@ defineOgImageComponent('Brand', {
       </div>
     </header>
 
+    <section id="how">
+      <div class="wrap">
+        <div class="sec-head" style="text-align:center;max-width:none;margin:0 auto 40px">
+          <span class="lbl">// How it works</span>
+          <h2 class="disp" style="max-width:20ch;margin:12px auto 0">Moving money is a 94-character minefield. We walk it for you.</h2>
+          <p style="margin:16px auto 0">The whole story, no finance degree required.</p>
+        </div>
+        <PipelineStory />
+      </div>
+    </section>
+
+    <section style="border-top:1px solid var(--ash)">
+      <div class="wrap">
+        <div class="sec-head">
+          <span class="lbl">// In plain English</span>
+          <h2 class="disp">What is this, really?</h2>
+        </div>
+        <div class="plain">
+          <div class="pl">
+            <h3>It writes the file your bank demands</h3>
+            <p>To pay staff or charge customers, you send your bank an ACH file - an ancient, rigid text format where one wrong space or one stray penny makes the bank reject everyone's payment. achkit writes that file perfectly, so you just say "pay Jane $100" and it handles the rest.</p>
+          </div>
+          <div class="pl">
+            <h3>NACHA doesn't give you software</h3>
+            <p>NACHA makes the rules banks follow - like the DMV writes road laws but doesn't hand you a car. They publish a giant PDF rulebook and leave the code to you. Before achkit your only options were to build it from scratch or hand a payment giant a cut of every transaction, forever. achkit is the free third option.</p>
+          </div>
+          <div class="pl">
+            <h3>Why pay if the library is free?</h3>
+            <p>The free library is a perfect offline spell-checker for the file - but it's blind to the real world. A typo'd routing number looks fine to it, and the payment bounces days later. Pro and Ultra check the Federal Reserve's live database to confirm the bank is real and open before money moves, and alert you when a payment bounces.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="problem">
       <div class="wrap">
         <div class="inv">
