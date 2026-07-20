@@ -19,3 +19,5 @@ site/.env
 site/data/
 site/debug-*.mjs
 site/hero-debug.png
+site/verify-*.mjs
+site/hero-*.png

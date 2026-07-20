@@ -122,14 +122,14 @@ onBeforeUnmount(() => cleanup?.())
   width: 100%;
   height: min(64vw, 560px);
   min-height: 380px;
-  border-radius: 44px;
-  /* Default = static banded fallback. Cleared once WebGL draws a frame. */
-  background: linear-gradient(180deg,
-    #d1ffca 0 11%, #cfccc4 11% 28%, #1f1f1f 28% 40%,
-    #b0834a 40% 56%, #cfccc4 56% 70%, #1f1f1f 70% 82%, #b0834a 82% 100%);
-  box-shadow: inset 0 0 60px rgba(0,0,0,.08);
+  /* Default = the rendered Blender totem (works in any browser, no WebGL).
+     Upgraded to the live rotating canvas only once WebGL actually draws. */
+  background: url('/hero-poster.png') center center / contain no-repeat;
+  animation: heroFloat 6s ease-in-out infinite;
 }
-.hero3d.gl-ready { background: transparent; box-shadow: none; border-radius: 0; }
+.hero3d.gl-ready { background: none; animation: none; }
 .hero3d :deep(canvas) { position: relative; z-index: 1; }
+@keyframes heroFloat { 0%, 100% { transform: translateY(-7px); } 50% { transform: translateY(7px); } }
+@media (prefers-reduced-motion: reduce) { .hero3d { animation: none; } }
 @media (max-width: 900px) { .hero3d { height: 440px; } }
 </style>
