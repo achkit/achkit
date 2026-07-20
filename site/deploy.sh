@@ -13,11 +13,8 @@ cd site
 npm ci --no-audit --no-fund
 NITRO_PRESET=node-server npm run build
 
-if pm2 describe achkit-site >/dev/null 2>&1; then
-  pm2 restart achkit-site --update-env
-else
-  PORT="$PORT" HOST="$HOST" pm2 start .output/server/index.mjs --name achkit-site
-fi
+# startOrReload re-reads ecosystem.config.cjs (and its .env) so env changes land.
+pm2 startOrReload ecosystem.config.cjs --update-env
 pm2 save
 
 sleep 2
