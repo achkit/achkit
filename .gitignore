@@ -9,3 +9,8 @@ build/
 *.egg-info/
 py/dist/
 gen.mjs
+
+site/node_modules/
+site/.nuxt/
+site/.output/
+site/.data/

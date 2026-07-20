@@ -1,0 +1,34 @@
+# achkit
+
+> The ACH file toolkit for developers. Generate, parse and validate NACHA ACH
+> files in a few lines. Fully typed, zero dependencies, returns and NOC handled.
+> Available for JavaScript/TypeScript (npm) and Python (PyPI) with byte-identical
+> output across both languages. MIT licensed.
+
+## Install
+
+- npm: `npm i achkit`
+- PyPI: `pip install achkit`
+
+## What it does
+
+- Generate NACHA ACH files: a typed builder that pads, balances batches, computes
+  entry hash and file/batch control totals, and adds block padding automatically.
+- Parse ACH files into a typed model with no positional string slicing.
+- Validate files against reconciliation rules: ABA routing checksum, entry hash,
+  batch and file control totals, blocking factor - the errors an ODFI rejects on.
+- Returns (R-codes) and Notification of Change (C-codes) decoding.
+- SEC codes: PPD, CCD, WEB, TEL, CTX and addenda.
+- Money is always integer cents; dates are always YYYY-MM-DD.
+
+## Links
+
+- Docs and source: https://github.com/achkit/achkit
+- npm: https://www.npmjs.com/package/achkit
+- PyPI: https://pypi.org/project/achkit
+
+## Hosted validation API
+
+achkit.com offers a hosted validation API adding live routing-number validity,
+NACHA rule updates pushed as they take effect, and return-file monitoring with
+webhooks - the parts that cannot ship as a static library.
