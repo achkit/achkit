@@ -1,6 +1,7 @@
 import { validate, parse, isValidRouting } from 'achkit'
 import { lookupKey, bumpUsage } from '../utils/keys'
 import { lookupRouting } from '../utils/routing'
+import { checkRules } from '../utils/rules'
 import { TIERS, FREE_PER_MINUTE } from '../utils/tiers'
 
 const MAX_BYTES = 5 * 1024 * 1024
@@ -55,6 +56,11 @@ export default defineEventHandler(async (event) => {
   }]).catch(() => {})
 
   const res: Record<string, unknown> = { ok, errors: errors.slice(0, 500), tier: rec ? rec.tier : 'demo' }
-  if (rec) res.routing = routing
+  if (rec) {
+    res.routing = routing
+    const rules = checkRules(body)
+    res.rulesVersion = rules.rulesVersion
+    res.ruleWarnings = rules.warnings
+  }
   return res
 })
