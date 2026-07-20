@@ -17,3 +17,5 @@ site/.data/
 site/ecosystem.config.cjs
 site/.env
 site/data/
+site/debug-*.mjs
+site/hero-debug.png

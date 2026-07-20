@@ -11,6 +11,11 @@ const rows = [
 <template>
   <section id="fit">
     <div class="wrap">
+      <div class="why-ach">
+        <span class="lbl">// Why ACH exists</span>
+        <p>Every time you pay by credit card, <b>Visa and Mastercard take a cut</b>. That toll is unavoidable and expensive - so the old, slow, bank-to-bank <b>ACH rails</b> are the only other way to move money without paying a percentage tax on every dollar. The catch: ACH's rules are ancient and brutal. That's why developers reach for a free tool like achkit - to navigate them without ripping their hair out.</p>
+      </div>
+
       <div class="inv fit-quote">
         <div class="wrap">
           <span class="lbl" style="color:var(--smoke)">// Where achkit fits</span>
@@ -50,6 +55,9 @@ const rows = [
 </template>
 
 <style scoped>
+.why-ach { max-width: 74ch; margin: 0 0 44px; }
+.why-ach p { font-size: clamp(20px, 1rem + 1vw, 27px); line-height: 1.45; color: #000; margin: 14px 0 0; letter-spacing: -.01em; }
+.why-ach b { background: linear-gradient(transparent 62%, var(--mint) 62%); }
 .fit-quote .wrap { padding: 64px 40px; }
 .fit-quote h2 { color: #fff; margin: 12px 0 0; }
 .fit-quote p { color: var(--ash); font-size: clamp(18px, 1rem + .8vw, 23px); line-height: 1.5; max-width: 52ch; margin: 20px 0 0; }

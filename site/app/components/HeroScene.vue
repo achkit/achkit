@@ -8,7 +8,15 @@ let cleanup: (() => void) | null = null
 onMounted(async () => {
   const el = host.value
   if (!el) return
-  const THREE = await import('three')
+
+  let THREE: typeof import('three')
+  try {
+    THREE = await import('three')
+  } catch (e) {
+    console.warn('[hero] three failed to load', e)
+    el.classList.add('nogl')
+    return
+  }
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const scene = new THREE.Scene()
@@ -16,7 +24,14 @@ onMounted(async () => {
   camera.position.set(0, 0.4, 7)
   camera.lookAt(0, 0, 0)
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  let renderer: THREE.WebGLRenderer
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  } catch (e) {
+    console.warn('[hero] webgl renderer failed', e)
+    el.classList.add('nogl')
+    return
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
   renderer.setClearColor(0x000000, 0)
   renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -82,5 +97,14 @@ onBeforeUnmount(() => cleanup?.())
 
 <style scoped>
 .hero3d { position: relative; width: 100%; height: min(64vw, 560px); min-height: 380px; }
+/* Static fallback for browsers where WebGL is unavailable. */
+.hero3d.nogl {
+  border-radius: 44px;
+  background:
+    linear-gradient(180deg,
+      #d1ffca 0 11%, #cfccc4 11% 28%, #1f1f1f 28% 40%,
+      #b0834a 40% 56%, #cfccc4 56% 70%, #1f1f1f 70% 82%, #b0834a 82% 100%);
+  box-shadow: inset 0 0 60px rgba(0,0,0,.08);
+}
 @media (max-width: 900px) { .hero3d { height: 440px; } }
 </style>
