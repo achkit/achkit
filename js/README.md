@@ -56,11 +56,32 @@ parsed = parse(data)
 - **Money is always integer cents. Dates are always `YYYY-MM-DD`.** No floats,
   no locale surprises.
 
-## Hosted validation API
+## Hosted API client (paid)
 
-The libraries are free and MIT forever. For production, the hosted API at
-[achkit.com](https://achkit.com) adds live routing-number validity, NACHA rule
-updates pushed as they take effect, and return-file monitoring with webhooks.
+The library is free and local. The hosted API adds what a local library can't -
+**live routing verification against the FedACH participant directory**. Get an
+API key at [achkit.com/dashboard](https://achkit.com/dashboard).
+
+```ts
+import { AchkitClient } from 'achkit'
+
+const client = new AchkitClient({ apiKey: 'ak_...' })
+const bank = await client.verifyRouting('021000021')
+// { routing, checksumValid, found, active, bank: { name, city, state } }
+
+const result = await client.validate(bytes) // reconciliation + live routing checks
+```
+
+```python
+from achkit import AchkitClient
+
+client = AchkitClient("ak_...")
+bank = client.verify_routing("021000021")
+result = client.validate(data)
+```
+
+Pro adds live routing verification + 10,000 validations/month; Ultra is unlimited
+with return-file monitoring. See [achkit.com](https://achkit.com).
 
 ## License
 

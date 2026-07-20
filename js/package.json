@@ -1,6 +1,6 @@
 {
   "name": "achkit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The ACH file toolkit for developers. Generate, parse and validate NACHA ACH files. Typed, zero-dependency.",
   "keywords": [
     "ach",
