@@ -1,12 +1,6 @@
 <script setup lang="ts">
 const authUser = useAuth()
 onMounted(refreshAuth)
-
-async function logout() {
-  await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
-  authUser.value = null
-  await navigateTo('/')
-}
 </script>
 
 <template>
@@ -19,17 +13,13 @@ async function logout() {
       <NuxtLink to="/docs">Docs</NuxtLink>
       <NuxtLink to="/#pricing">Pricing</NuxtLink>
       <a href="https://github.com/achkit/achkit">GitHub</a>
-      <NuxtLink v-if="authUser" to="/dashboard">Dashboard</NuxtLink>
     </div>
 
     <div class="navcta">
-      <template v-if="authUser">
-        <button class="btn dark round" style="cursor:pointer" @click="logout">Sign out</button>
-      </template>
-      <template v-else>
-        <NuxtLink to="/login" class="signin">Sign in</NuxtLink>
-        <NuxtLink class="btn dark round" to="/docs">Get the packages</NuxtLink>
-      </template>
+      <NuxtLink v-if="authUser" class="btn dark round" to="/dashboard">Dashboard</NuxtLink>
+      <NuxtLink v-else class="btn dark round" to="/login">Login</NuxtLink>
     </div>
   </nav>
+
+  <MobileTabBar />
 </template>

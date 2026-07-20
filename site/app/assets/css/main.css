@@ -36,7 +36,11 @@ nav .navcta .signin:hover { color: #000; }
 .btn.dark:hover { background: var(--graphite); }
 .btn.ghost { background: transparent; border: 1.5px solid var(--slate); color: var(--slate); border-radius: 4px; padding: 12px 20px; }
 .btn.ghost:hover { border-color: #000; color: #000; }
-@media (max-width: 860px) { nav .navpill { display: none; } }
+@media (max-width: 860px) {
+  nav { display: flex; justify-content: space-between; }
+  nav .navpill { display: none; }
+}
+@media (max-width: 768px) { body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); } }
 
 .hero { padding: 8px 0 72px; }
 .hero .grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: stretch; min-height: min(86vh, 900px); }
