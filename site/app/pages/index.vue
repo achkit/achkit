@@ -16,6 +16,12 @@ useSeoMeta({
   ogUrl: 'https://achkit.com',
   twitterCard: 'summary_large_image',
 })
+
+defineOgImageComponent('Brand', {
+  eyebrow: 'NACHA / ACH TOOLKIT',
+  title: 'Move money files without counting bytes',
+  subtitle: 'Generate, parse and validate NACHA ACH files. npm and PyPI, byte-identical.',
+})
 </script>
 
 <template>
@@ -51,42 +57,7 @@ useSeoMeta({
           </div>
         </div>
 
-        <div class="scene" aria-hidden="true">
-          <div class="contact" />
-          <div class="totem">
-            <div class="cube p-core">
-              <div class="face fr dark2"><span class="l">ACH</span></div>
-              <div class="face bk con" /><div class="face rt wood" /><div class="face lt con" />
-              <div class="face tp mint2" /><div class="face bt con" />
-            </div>
-            <div class="cube p-rt">
-              <div class="face fr con" /><div class="face bk con" />
-              <div class="face rt orange"><span class="l">NACHA</span></div>
-              <div class="face lt wood" /><div class="face tp con" /><div class="face bt con" />
-            </div>
-            <div class="cube p-tp">
-              <div class="face fr con"><span class="l">v0</span></div>
-              <div class="face bk con" /><div class="face rt con" /><div class="face lt con" />
-              <div class="face tp yellow2"><span class="l">94</span></div>
-              <div class="face bt con" />
-            </div>
-            <div class="cube p-fr">
-              <div class="face fr pink"><span class="l">npm</span></div>
-              <div class="face bk con" /><div class="face rt con" /><div class="face lt con" />
-              <div class="face tp wood" /><div class="face bt con" />
-            </div>
-            <div class="cube p-lb">
-              <div class="face fr con" /><div class="face bk con" /><div class="face rt con" />
-              <div class="face lt purple"><span class="l">PyPI</span></div>
-              <div class="face tp con" /><div class="face bt con" />
-            </div>
-            <div class="cube p-bf">
-              <div class="face fr cyan"><span class="l">PPD</span></div>
-              <div class="face bk con" /><div class="face rt con" /><div class="face lt con" />
-              <div class="face tp con" /><div class="face bt wood" />
-            </div>
-          </div>
-        </div>
+        <HeroScene />
       </div>
     </header>
 

@@ -1,9 +1,13 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-01',
   ssr: true,
-  modules: ['@nuxt/fonts', '@nuxtjs/sitemap'],
+  modules: ['@nuxt/fonts', '@nuxtjs/sitemap', 'nuxt-og-image'],
   css: ['~/assets/css/main.css'],
   site: { url: 'https://achkit.com', name: 'achkit' },
+  ogImage: {
+    fonts: ['Archivo+Black:400', 'Inter:400', 'Inter:600', 'JetBrains+Mono:400'],
+    defaults: { width: 1200, height: 630 },
+  },
   runtimeConfig: {
     stripeSecret: '',
     stripeWebhookSecret: '',
