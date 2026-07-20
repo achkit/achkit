@@ -66,21 +66,46 @@ Purge CF cache for static assets if needed.
   registration used a `hello@achkit.co` typo and email-OTP locked the account;
   post-recovery the npm/PyPI primary email should move to `hello@achkit.com`.
 
+## Paid product - what we host (the real value)
+
+The free lib does math (checksum/padding/control totals). The hosted API adds what
+a local lib CANNOT: **live routing verification against the FedACH participant
+directory** (is the routing a real, active ACH bank + which bank), always-current
+NACHA rules, and return monitoring. This is the metered moat.
+
+- `server/utils/routing.ts` - real-time lookup from Dragonfly (`achkit:routing:<n>`).
+- `GET /api/routing/:number` (paid) - verify one routing: real+active bank + checksum.
+- `POST /api/validate` - free demo = checksum only; keyed tiers also cross-check
+  every entry's routing vs the directory and return `routing[]`.
+- **Directory ingester** `site/scripts/load-routing.mjs` - loads Dragonfly + CH.
+  Reads the official Fed fixed-width file at `site/data/FedACHdir.txt` if present,
+  else a verified seed (10 banks). BEFORE SELLING: drop the real Fed file and re-run
+  (`node scripts/load-routing.mjs` on the box) - the seed is a demo, not full data.
+- Analytics: every call logged to `achkit.usage_events` (ClickHouse); monthly limits
+  via Dragonfly counters (`achkit:usage:<key>:<yyyymm>`). Tables: `achkit.usage_events`,
+  `achkit.routing_directory`. `server/utils/clickhouse.ts` = chQuery/chInsert/ch.
+
 ## Billing (Stripe, embedded on-site, no external redirect)
 
-- Tiers single source: `site/server/utils/tiers.ts` (Pro $29/mo, Scale $99/mo,
-  free demo). Prices/limits live ONLY there.
-- Flow: pricing button -> `POST /api/billing/checkout` mints an embedded Checkout
-  Session (`ui_mode: embedded`, subscription) -> Stripe.js mounts it on our page ->
-  on payment, `POST /api/stripe/webhook` provisions the customer + issues an API
-  key into Dragonfly -> `/billing/success` shows the key.
-- `POST /api/validate` gates on `x-api-key`: valid key -> tier limits + usage
-  tracking; no key -> free demo (best-effort per-IP limit).
-- Store: Dragonfly on the box (keys `achkit:customer:*`, `achkit:key:*`,
-  `achkit:usage:*`). `server/utils/store.ts` lazy ioredis singleton.
-- Config (`runtimeConfig`): server `stripeSecret`, `stripeWebhookSecret`,
-  `dragonflyUrl`; public `stripePublishable`, `pricePro`, `priceScale`.
-- Stripe webhook endpoint registered at `https://achkit.com/api/stripe/webhook`.
+- Tiers single source: `site/server/utils/tiers.ts` - **Pro** $29/mo (10k
+  validations), **Ultra** $99/mo (unlimited). Two tiers only, no "contact us".
+- Flow: pricing button -> `POST /api/billing/checkout` (embedded Checkout Session)
+  -> Stripe.js mounts on our page -> `POST /api/stripe/webhook` (signature-verified)
+  issues/rotates/revokes the API key in Dragonfly -> `/billing/success` shows it.
+- Plan switch with proration: `POST /api/billing/change` (`proration_behavior:
+  create_prorations`), on-site.
+- Store: Dragonfly (`achkit:key:*`, `achkit:customer:*:key`, `achkit:usage:*`).
+- Config = env on the box, NOT in git: `/opt/achkit-site/site/.env` (NUXT_*
+  vars) loaded by `/opt/achkit-site/site/ecosystem.config.cjs` (pm2, box-only,
+  gitignored). Keys: `NUXT_STRIPE_SECRET`, `NUXT_PUBLIC_STRIPE_PUBLISHABLE`,
+  `NUXT_STRIPE_WEBHOOK_SECRET`, `NUXT_PRICE_PRO`, `NUXT_PRICE_ULTRA`,
+  `NUXT_CLICKHOUSE_*`, `NUXT_DRAGONFLY_URL`. pm2 process started via the ecosystem
+  file so env survives restarts; `deploy.sh` restart preserves it.
+- Webhook endpoint: `https://achkit.com/api/stripe/webhook`. Events:
+  `checkout.session.completed`, `customer.subscription.updated`,
+  `customer.subscription.deleted`.
+- TO ACTIVATE: set `sk_`, `pk_`, and the two price IDs in `.env`, `pm2 restart
+  achkit-site`. Webhook secret already set.
 
 ## Design system (brutalist-editorial / dayos)
 
