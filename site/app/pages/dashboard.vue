@@ -14,7 +14,6 @@ const paid = computed(() => user.value?.plan === 'pro' || user.value?.plan === '
 function copyKey() {
   if (import.meta.client && navigator.clipboard && user.value?.key) navigator.clipboard.writeText(user.value.key)
 }
-async function logout() { await $fetch('/api/auth/logout', { method: 'POST' }); useAuth().value = null; await navigateTo('/') }
 async function cancel() {
   if (!confirm('Cancel your subscription at the end of the billing period?')) return
   await $fetch('/api/billing/cancel', { method: 'POST' }).catch(() => {})
@@ -27,17 +26,7 @@ useSeoMeta({ title: 'Dashboard - achkit', robots: 'noindex' })
 
 <template>
   <div v-if="user">
-    <nav>
-      <div class="pill">
-        <NuxtLink class="brand" to="/">
-          <svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2.4"><rect x="3" y="6" width="26" height="20" rx="2" /><path d="M3 12h26" /><path d="M8 18h6M8 22h10" stroke-width="1.8" /></svg>achkit
-        </NuxtLink>
-        <div class="links">
-          <a href="/docs">Docs</a>
-          <button class="btn ghost" style="cursor:pointer" @click="logout">Sign out</button>
-        </div>
-      </div>
-    </nav>
+    <SiteHeader />
 
     <section>
       <div class="wrap" style="max-width: 860px">
@@ -78,6 +67,7 @@ useSeoMeta({ title: 'Dashboard - achkit', robots: 'noindex' })
     </section>
 
     <CheckoutModal />
+    <SiteFooter />
   </div>
 </template>
 

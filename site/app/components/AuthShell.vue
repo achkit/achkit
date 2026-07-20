@@ -4,14 +4,7 @@ defineProps<{ eyebrow?: string; title: string }>()
 
 <template>
   <div>
-    <nav>
-      <div class="pill">
-        <NuxtLink class="brand" to="/">
-          <svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2.4"><rect x="3" y="6" width="26" height="20" rx="2" /><path d="M3 12h26" /><path d="M8 18h6M8 22h10" stroke-width="1.8" /></svg>achkit
-        </NuxtLink>
-        <div class="links"><NuxtLink class="btn dark round" to="/">Back to site</NuxtLink></div>
-      </div>
-    </nav>
+    <SiteHeader />
     <section>
       <div class="wrap" style="max-width: 460px">
         <span v-if="eyebrow" class="lbl">// {{ eyebrow }}</span>
@@ -19,6 +12,7 @@ defineProps<{ eyebrow?: string; title: string }>()
         <slot />
       </div>
     </section>
+    <SiteFooter />
   </div>
 </template>
 

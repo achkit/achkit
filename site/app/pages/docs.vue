@@ -8,19 +8,7 @@ defineOgImageComponent('Brand', { eyebrow: 'DOCS', title: 'achkit documentation'
 
 <template>
   <div>
-    <nav>
-      <div class="pill">
-        <NuxtLink class="brand" to="/">
-          <svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2.4"><rect x="3" y="6" width="26" height="20" rx="2" /><path d="M3 12h26" /><path d="M8 18h6M8 22h10" stroke-width="1.8" /></svg>achkit
-        </NuxtLink>
-        <div class="links">
-          <a href="#library">Library</a>
-          <a href="#api">API</a>
-          <a href="https://github.com/achkit/achkit">GitHub</a>
-          <NuxtLink class="btn dark round" to="/dashboard">Dashboard</NuxtLink>
-        </div>
-      </div>
-    </nav>
+    <SiteHeader />
 
     <section>
       <div class="wrap docs" style="max-width: 820px">
@@ -75,6 +63,7 @@ file.<span class="fn">batch</span>({ sec: <span class="st">'PPD'</span>, descrip
         <p style="margin-top:40px"><NuxtLink class="btn dark round" to="/signup">Create an account</NuxtLink></p>
       </div>
     </section>
+    <SiteFooter />
   </div>
 </template>
 
