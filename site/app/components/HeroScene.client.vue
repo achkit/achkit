@@ -1,31 +1,30 @@
 <script setup lang="ts">
-// WebGPU renderer (Metal/Vulkan/D3D native) with automatic WebGL2 fallback.
-// The loop is paused whenever the hero is offscreen, so it never heats the GPU
-// while the visitor is reading further down the page.
-import * as THREE from 'three/webgpu'
+// GPU-accelerated WebGL (Metal-backed on Apple via the browser). Kept light:
+// low-poly Blender GLB, capped pixel ratio, and the loop is PAUSED whenever the
+// hero is offscreen so it never heats the device while the visitor reads on.
+import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 const host = ref<HTMLElement | null>(null)
 let cleanup: (() => void) | null = null
 
-async function init(el: HTMLElement) {
+function init(el: HTMLElement) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100)
-  camera.position.set(2.4, 0.6, 8.4)
+  camera.position.set(2.4, 0.6, 8.6)
   camera.lookAt(0, 0.1, 0)
 
-  const renderer = new THREE.WebGPURenderer({ antialias: true, alpha: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75))
   renderer.outputColorSpace = THREE.SRGBColorSpace
   el.appendChild(renderer.domElement)
-  await renderer.init()
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xbfbfbf, 0.55))
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xbfbfbf, 0.6))
   const key = new THREE.DirectionalLight(0xffffff, 2.4)
   key.position.set(5, 8, 6)
   scene.add(key)
-  const rim = new THREE.DirectionalLight(0xffffff, 0.8)
+  const rim = new THREE.DirectionalLight(0xffffff, 0.85)
   rim.position.set(-6, 2, -3)
   scene.add(rim)
 
@@ -43,7 +42,6 @@ async function init(el: HTMLElement) {
     tower.position.z -= center.z
     tower.position.y -= box.min.y
     towerH = size.y
-
     for (let k = 0; k < 3; k++) {
       const c = tower.clone(true)
       c.position.y = k * towerH
@@ -51,7 +49,7 @@ async function init(el: HTMLElement) {
       clones.push(c)
     }
     spin.position.y = -towerH * 1.5 + 0.3
-  })
+  }, undefined, (err) => console.error('[hero] glb load failed', err))
 
   function resize() {
     const w = el.clientWidth, h = el.clientHeight
@@ -63,7 +61,6 @@ async function init(el: HTMLElement) {
   const ro = new ResizeObserver(resize)
   ro.observe(el)
 
-  // Only run the render loop while the hero is on screen.
   let visible = true
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting }, { threshold: 0.01 })
   io.observe(el)
