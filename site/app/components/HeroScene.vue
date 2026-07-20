@@ -1,7 +1,9 @@
 <script setup lang="ts">
-// Normal component: the <div> is server-rendered (reserves layout space), and
-// three is dynamically imported only in onMounted (client) so SSR never touches
-// it. Procedural, core-only, GPU WebGL, paused offscreen.
+// The <div> ships with a static banded fallback as its background (pure CSS,
+// always visible - no browser can show "blank"). three is imported on mount;
+// only once WebGL has actually drawn a frame do we clear the fallback so the
+// canvas shows. If three is blocked, WebGL is off, or the GPU is unavailable,
+// the bands simply stay.
 const host = ref<HTMLElement | null>(null)
 let cleanup: (() => void) | null = null
 
@@ -13,8 +15,15 @@ onMounted(async () => {
   try {
     THREE = await import('three')
   } catch (e) {
-    console.warn('[hero] three failed to load', e)
-    el.classList.add('nogl')
+    console.warn('[hero] three unavailable, keeping fallback', e)
+    return
+  }
+
+  let renderer: THREE.WebGLRenderer
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  } catch (e) {
+    console.warn('[hero] webgl unavailable, keeping fallback', e)
     return
   }
 
@@ -24,14 +33,6 @@ onMounted(async () => {
   camera.position.set(0, 0.4, 7)
   camera.lookAt(0, 0, 0)
 
-  let renderer: THREE.WebGLRenderer
-  try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-  } catch (e) {
-    console.warn('[hero] webgl renderer failed', e)
-    el.classList.add('nogl')
-    return
-  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
   renderer.setClearColor(0x000000, 0)
   renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -63,8 +64,7 @@ onMounted(async () => {
   })
 
   function resize() {
-    const w = el!.clientWidth || 480
-    const h = el!.clientHeight || 480
+    const w = el!.clientWidth || 480, h = el!.clientHeight || 480
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     camera.updateProjectionMatrix()
@@ -76,10 +76,12 @@ onMounted(async () => {
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting }, { threshold: 0.01 })
   io.observe(el)
 
+  let cleared = false
   renderer.setAnimationLoop(() => {
     if (!visible) return
     if (!reduce) group.rotation.y += 0.006
     renderer.render(scene, camera)
+    if (!cleared) { el!.classList.add('gl-ready'); cleared = true } // WebGL drew a frame - drop the fallback
   })
 
   cleanup = () => {
@@ -96,15 +98,19 @@ onBeforeUnmount(() => cleanup?.())
 </template>
 
 <style scoped>
-.hero3d { position: relative; width: 100%; height: min(64vw, 560px); min-height: 380px; }
-/* Static fallback for browsers where WebGL is unavailable. */
-.hero3d.nogl {
+.hero3d {
+  position: relative;
+  width: 100%;
+  height: min(64vw, 560px);
+  min-height: 380px;
   border-radius: 44px;
-  background:
-    linear-gradient(180deg,
-      #d1ffca 0 11%, #cfccc4 11% 28%, #1f1f1f 28% 40%,
-      #b0834a 40% 56%, #cfccc4 56% 70%, #1f1f1f 70% 82%, #b0834a 82% 100%);
+  /* Default = static banded fallback. Cleared once WebGL draws a frame. */
+  background: linear-gradient(180deg,
+    #d1ffca 0 11%, #cfccc4 11% 28%, #1f1f1f 28% 40%,
+    #b0834a 40% 56%, #cfccc4 56% 70%, #1f1f1f 70% 82%, #b0834a 82% 100%);
   box-shadow: inset 0 0 60px rgba(0,0,0,.08);
 }
+.hero3d.gl-ready { background: transparent; box-shadow: none; border-radius: 0; }
+.hero3d :deep(canvas) { position: relative; z-index: 1; }
 @media (max-width: 900px) { .hero3d { height: 440px; } }
 </style>
