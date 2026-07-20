@@ -15,7 +15,7 @@ function loadStripe(): Promise<any> {
   })
 }
 
-async function mount(tier: 'pro' | 'scale') {
+async function mount(tier: 'pro' | 'ultra') {
   loading.value = true
   error.value = ''
   try {

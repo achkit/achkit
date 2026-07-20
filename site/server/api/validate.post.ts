@@ -1,10 +1,11 @@
-import { validate } from 'achkit'
+import { validate, parse, isValidRouting } from 'achkit'
 import { lookupKey, bumpUsage } from '../utils/keys'
+import { lookupRouting } from '../utils/routing'
 import { TIERS, FREE_PER_MINUTE } from '../utils/tiers'
 
 const MAX_BYTES = 5 * 1024 * 1024
-// ponytail: best-effort in-memory free-tier limiter, per-process. Persists in the
-// pm2 node process; keyed API tiers use Dragonfly counters below.
+// ponytail: best-effort in-memory free-tier limiter, per pm2 process. Keyed tiers
+// use Dragonfly counters (monthly) and log to ClickHouse for analytics.
 const hits = new Map<string, { n: number; t: number }>()
 
 export default defineEventHandler(async (event) => {
@@ -18,7 +19,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 429, statusMessage: `Monthly limit reached (${tier.limitPerMonth}). Upgrade for more.` })
     }
   } else {
-    // free, unauthenticated demo - best-effort per-IP/minute
     const ip = getRequestIP(event, { xForwardedFor: true }) || 'anon'
     const now = Date.now()
     const h = hits.get(ip)
@@ -32,5 +32,29 @@ export default defineEventHandler(async (event) => {
   if (body.length > MAX_BYTES) throw createError({ statusCode: 413, statusMessage: 'File exceeds the 5MB limit.' })
 
   const { ok, errors } = validate(body)
-  return { ok, errors: errors.slice(0, 500), tier: rec ? rec.tier : 'demo' }
+
+  // Paid tiers: live routing verification against the FedACH directory.
+  const routing: Array<{ routing: string; checksumValid: boolean; found: boolean; active: boolean; bank: string | null }> = []
+  let entries = 0
+  if (rec) {
+    try {
+      const parsed = parse(body)
+      const uniq = new Set<string>()
+      for (const b of parsed.batches) for (const e of b.entries) { entries++; uniq.add(e.routing) }
+      for (const r of uniq) {
+        const info = await lookupRouting(r)
+        routing.push({ routing: r, checksumValid: isValidRouting(r), found: !!info, active: info?.active ?? false, bank: info ? info.name : null })
+      }
+    } catch { /* malformed file - errors already captured by validate */ }
+  }
+
+  chInsert('achkit.usage_events', [{
+    api_key: apiKey, customer_id: rec?.customerId || '', tier: rec ? rec.tier : 'demo',
+    endpoint: 'validate', ok: ok ? 1 : 0, entries, routing_checked: routing.length,
+    ip: getRequestIP(event, { xForwardedFor: true }) || '',
+  }]).catch(() => {})
+
+  const res: Record<string, unknown> = { ok, errors: errors.slice(0, 500), tier: rec ? rec.tier : 'demo' }
+  if (rec) res.routing = routing
+  return res
 })

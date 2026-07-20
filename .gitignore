@@ -14,3 +14,6 @@ site/node_modules/
 site/.nuxt/
 site/.output/
 site/.data/
+site/ecosystem.config.cjs
+site/.env
+site/data/

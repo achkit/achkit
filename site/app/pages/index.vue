@@ -137,8 +137,8 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
       <div class="wrap">
         <div class="sec-head">
           <span class="lbl">// Pricing</span>
-          <h2 class="disp">The library is free. Scale on the API</h2>
-          <p>Everything you need to ship runs locally and free forever. Pay only for hosted validation, monitoring, and rule updates pushed to you.</p>
+          <h2 class="disp">The library is free. Verify on the API</h2>
+          <p>The library runs on your box, free forever - build, parse and validate ACH files locally. The paid API adds what a local library structurally cannot: live bank-routing verification against the FedACH directory, always-current NACHA rules, and return monitoring.</p>
         </div>
         <div class="prow">
           <div class="plan">
@@ -152,25 +152,25 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
             <a class="btn dark" href="#usage">Install it</a>
           </div>
           <div class="plan dark">
-            <span class="nm">Pro API</span>
+            <span class="nm">Pro</span>
             <div class="pr">$29<small> / mo</small></div>
             <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Hosted validation endpoint</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Routing-number + ABA checks</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Rule updates pushed automatically</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>10k files / mo</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Live routing verification vs the FedACH directory</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Always-current NACHA rule validation</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Hosted API + usage analytics</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>10,000 validations / mo</li>
             </ul>
-            <button class="btn dark" @click="openCheckout('pro')">Start free trial</button>
+            <button class="btn dark" @click="openCheckout('pro')">Start on Pro</button>
           </div>
           <div class="plan">
-            <span class="nm">Scale</span>
+            <span class="nm">Ultra</span>
             <div class="pr">$99<small> / mo</small></div>
             <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Unlimited validation</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Return-file monitoring + webhooks</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>SLA + priority support</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Everything in Pro, unlimited validations</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Return-file (R-code) monitoring + webhooks</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Priority support</li>
             </ul>
-            <button class="btn ghost" @click="openCheckout('scale')">Get Scale</button>
+            <button class="btn ghost" @click="openCheckout('ultra')">Start on Ultra</button>
           </div>
         </div>
       </div>

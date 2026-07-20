@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody<{ tier?: TierId }>(event)
   const tier = body?.tier
-  if (tier !== 'pro' && tier !== 'scale') throw createError({ statusCode: 400, statusMessage: 'Unknown plan.' })
+  if (tier !== 'pro' && tier !== 'ultra') throw createError({ statusCode: 400, statusMessage: 'Unknown plan.' })
 
   const price = priceIdForTier(tier)
   if (!price) throw createError({ statusCode: 503, statusMessage: 'This plan is not available yet.' })

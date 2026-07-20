@@ -12,8 +12,11 @@ export default defineNuxtConfig({
     stripeSecret: '',
     stripeWebhookSecret: '',
     dragonflyUrl: 'redis://127.0.0.1:6379',
+    clickhouseUrl: 'http://127.0.0.1:8123',
+    clickhouseUser: 'default',
+    clickhousePassword: '',
     pricePro: '',
-    priceScale: '',
+    priceUltra: '',
     public: {
       stripePublishable: '',
     },
