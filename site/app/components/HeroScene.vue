@@ -1,12 +1,15 @@
 <script setup lang="ts">
-// Procedural Three.js (core only - no external loaders/assets, so nothing can
-// fail to bundle). GPU-accelerated WebGL; loop pauses offscreen; low pixel ratio.
-import * as THREE from 'three'
-
+// Normal component: the <div> is server-rendered (reserves layout space), and
+// three is dynamically imported only in onMounted (client) so SSR never touches
+// it. Procedural, core-only, GPU WebGL, paused offscreen.
 const host = ref<HTMLElement | null>(null)
 let cleanup: (() => void) | null = null
 
-function init(el: HTMLElement) {
+onMounted(async () => {
+  const el = host.value
+  if (!el) return
+  const THREE = await import('three')
+
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100)
@@ -14,23 +17,20 @@ function init(el: HTMLElement) {
   camera.lookAt(0, 0, 0)
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
   renderer.setClearColor(0x000000, 0)
   renderer.outputColorSpace = THREE.SRGBColorSpace
   el.appendChild(renderer.domElement)
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.85))
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9))
   const key = new THREE.DirectionalLight(0xffffff, 2.3); key.position.set(4, 7, 6); scene.add(key)
   const rim = new THREE.DirectionalLight(0xffffff, 0.7); rim.position.set(-5, 2, -4); scene.add(rim)
 
-  const m = (c: number, r = 0.85) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: 0 })
+  const m = (c: number, r = 0.85) => new THREE.MeshStandardMaterial({ color: c, roughness: r })
   const concrete = m(0xd3cfc7, 0.95), wood = m(0xb0834a, 0.6), dark = m(0x1f1f1f, 0.5)
   const mint = m(0xd1ffca, 0.4), yellow = m(0xfff100, 0.4), pink = m(0xff4fa0, 0.4), cyan = m(0x33c4ff, 0.4)
 
-  const group = new THREE.Group()
-  group.rotation.x = -0.16
-  scene.add(group)
-
+  const group = new THREE.Group(); group.rotation.x = -0.16; scene.add(group)
   const R = 1.25, H = 0.52, N = 8
   const bands = [concrete, wood, dark, concrete, wood, dark, concrete, mint]
   for (let i = 0; i < N; i++) {
@@ -39,8 +39,7 @@ function init(el: HTMLElement) {
     hex.rotation.y = i * 0.05
     group.add(hex)
   }
-  const accents = [cyan, pink, yellow, dark]
-  accents.forEach((mm, i) => {
+  ;[cyan, pink, yellow, dark].forEach((mm, i) => {
     const b = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.5, 0.85), mm)
     const a = i * Math.PI / 2 + 0.4
     b.position.set(Math.cos(a) * (R + 0.55), (i - 1.5) * H * 2, Math.sin(a) * (R + 0.55))
@@ -49,8 +48,8 @@ function init(el: HTMLElement) {
   })
 
   function resize() {
-    const w = el.clientWidth, h = el.clientHeight
-    if (!w || !h) return
+    const w = el!.clientWidth || 480
+    const h = el!.clientHeight || 480
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     camera.updateProjectionMatrix()
@@ -69,13 +68,11 @@ function init(el: HTMLElement) {
   })
 
   cleanup = () => {
-    renderer.setAnimationLoop(null)
-    io.disconnect(); ro.disconnect(); renderer.dispose()
+    renderer.setAnimationLoop(null); io.disconnect(); ro.disconnect(); renderer.dispose()
     if (renderer.domElement.parentNode === el) el.removeChild(renderer.domElement)
   }
-}
+})
 
-onMounted(() => { if (host.value) init(host.value) })
 onBeforeUnmount(() => cleanup?.())
 </script>
 
