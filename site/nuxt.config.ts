@@ -4,6 +4,16 @@ export default defineNuxtConfig({
   modules: ['@nuxt/fonts', '@nuxtjs/sitemap'],
   css: ['~/assets/css/main.css'],
   site: { url: 'https://achkit.com', name: 'achkit' },
+  runtimeConfig: {
+    stripeSecret: '',
+    stripeWebhookSecret: '',
+    dragonflyUrl: 'redis://127.0.0.1:6379',
+    pricePro: '',
+    priceScale: '',
+    public: {
+      stripePublishable: '',
+    },
+  },
   nitro: {
     prerender: { autoSubfolderIndex: false },
   },

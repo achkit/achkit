@@ -189,7 +189,7 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Rule updates pushed automatically</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>10k files / mo</li>
             </ul>
-            <a class="btn dark" href="#usage">Start free trial</a>
+            <button class="btn dark" @click="openCheckout('pro')">Start free trial</button>
           </div>
           <div class="plan">
             <span class="nm">Scale</span>
@@ -199,7 +199,7 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Return-file monitoring + webhooks</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>SLA + priority support</li>
             </ul>
-            <a class="btn ghost" href="#usage">Talk to us</a>
+            <button class="btn ghost" @click="openCheckout('scale')">Get Scale</button>
           </div>
         </div>
       </div>
@@ -225,5 +225,7 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
         </div>
       </div>
     </footer>
+
+    <CheckoutModal />
   </div>
 </template>
