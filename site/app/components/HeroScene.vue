@@ -21,7 +21,7 @@ onMounted(async () => {
 
   let renderer: THREE.WebGLRenderer
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
   } catch (e) {
     console.warn('[hero] webgl unavailable, keeping fallback', e)
     return
@@ -76,12 +76,31 @@ onMounted(async () => {
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting }, { threshold: 0.01 })
   io.observe(el)
 
-  let cleared = false
+  let checked = false
   renderer.setAnimationLoop(() => {
     if (!visible) return
     if (!reduce) group.rotation.y += 0.006
     renderer.render(scene, camera)
-    if (!cleared) { el!.classList.add('gl-ready'); cleared = true } // WebGL drew a frame - drop the fallback
+    if (!checked) {
+      checked = true
+      // Only clear the fallback if the GPU actually drew visible pixels - some
+      // browsers create a WebGL context that silently renders nothing.
+      let drew = false
+      try {
+        const gl = renderer.getContext()
+        const cw = renderer.domElement.width, chh = renderer.domElement.height
+        const buf = new Uint8Array(4 * 400)
+        gl.readPixels(Math.max(0, (cw >> 1) - 10), Math.max(0, (chh >> 1) - 10), 20, 20, gl.RGBA, gl.UNSIGNED_BYTE, buf)
+        for (let i = 3; i < buf.length; i += 4) { if (buf[i] > 8) { drew = true; break } }
+      } catch { drew = false }
+      if (drew) {
+        el!.classList.add('gl-ready')
+      } else {
+        // broken/blocked WebGL - keep the CSS bands, drop the dead canvas
+        renderer.setAnimationLoop(null)
+        if (renderer.domElement.parentNode === el) el!.removeChild(renderer.domElement)
+      }
+    }
   })
 
   cleanup = () => {
