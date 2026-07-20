@@ -52,11 +52,30 @@ file.<span class="fn">batch</span>({ sec: <span class="st">'PPD'</span>, descrip
 
 <span class="cm">// { routing, checksumValid, found, active, bank: { name, city, state } }</span></pre></div>
 
+        <p style="margin-top:8px">Keyed <span class="mono">/api/validate</span> responses also include <span class="mono">rulesVersion</span> and a <span class="mono">ruleWarnings[]</span> array - stale effective dates, invalid SEC codes, non-zero prenotes, and Same-Day amount-cap breaches, checked against the current NACHA rule set.</p>
+
+        <h3 class="ep">POST /api/returns <span class="badge ultra">ultra</span></h3>
+        <p>Send an ACH return file (the R-code addenda your ODFI hands back). We decode every return into a structured event and deliver it to your registered webhooks.</p>
+        <div class="codewrap"><pre>curl -X POST https://achkit.com/api/returns \
+  -H <span class="st">"x-api-key: ak_your_key"</span> \
+  --data-binary @returns.ach
+
+<span class="cm">// { count, returns: [{ returnCode, reason, routing, amountCents, traceNumber }] }</span></pre></div>
+
+        <h3 class="ep">POST/GET/DELETE /api/webhooks <span class="badge ultra">ultra</span></h3>
+        <p>Register the https URLs that should receive return events. Each delivery is signed with <span class="mono">x-achkit-signature</span> - an HMAC-SHA256 of the raw body using the secret returned when you add the hook.</p>
+        <div class="codewrap"><pre>curl -X POST https://achkit.com/api/webhooks \
+  -H <span class="st">"x-api-key: ak_your_key"</span> \
+  -H <span class="st">"content-type: application/json"</span> \
+  -d <span class="st">'{"url":"https://your-app.com/hooks/ach"}'</span>
+
+<span class="cm">// { id, url, secret }  -> manage them in the dashboard</span></pre></div>
+
         <h2 class="disp">Plans &amp; limits</h2>
         <ul class="plans">
           <li><b>Free library</b> - unlimited, local, MIT.</li>
           <li><b>Pro</b> - $29/mo, 10,000 validations/month, live routing verification.</li>
-          <li><b>Ultra</b> - $99/mo, unlimited validations, return monitoring.</li>
+          <li><b>Ultra</b> - $99/mo, unlimited validations, return monitoring + signed webhooks.</li>
         </ul>
         <p>Errors use standard HTTP status codes with a plain-text message. <span class="mono">401</span> = missing/invalid key, <span class="mono">429</span> = over your monthly limit.</p>
 
@@ -75,6 +94,7 @@ file.<span class="fn">batch</span>({ sec: <span class="st">'PPD'</span>, descrip
 .badge { font-family: var(--mono); font-size: 11px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; letter-spacing: 0; }
 .badge.free { background: var(--mist); color: var(--slate); }
 .badge.paid { background: var(--mint); color: #0a5a2f; }
+.badge.ultra { background: #000; color: #fff; }
 .plans { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .plans li { color: var(--slate); font-size: 16px; }
 </style>
