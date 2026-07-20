@@ -1,6 +1,14 @@
 import Stripe from 'stripe'
 import { issueKey, revokeCustomer } from '../../utils/keys'
 import { tierForPriceId, type TierId } from '../../utils/tiers'
+import { userByCustomer, upsertUser } from '../../utils/auth'
+
+async function linkKeyToUser(customerId: string, tier: TierId, metaEmail?: string) {
+  const key = await issueKey(customerId, tier)
+  const email = metaEmail || (await userByCustomer(customerId))
+  if (email) await upsertUser(email, { key, plan: tier })
+  return key
+}
 
 export default defineEventHandler(async (event) => {
   const cfg = useRuntimeConfig()
@@ -23,22 +31,28 @@ export default defineEventHandler(async (event) => {
     const customerId = typeof s.customer === 'string' ? s.customer : s.customer?.id
     const tier = (s.metadata?.tier as TierId) || 'pro'
     if (customerId) {
-      const key = await issueKey(customerId, tier)
+      const key = await linkKeyToUser(customerId, tier, s.metadata?.email)
       await store().set(`achkit:session:${s.id}:key`, key, 'EX', 3600)
     }
   } else if (evt.type === 'customer.subscription.deleted') {
     const sub = evt.data.object as Stripe.Subscription
     const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer?.id
-    if (customerId) await revokeCustomer(customerId)
+    if (customerId) {
+      await revokeCustomer(customerId)
+      const email = await userByCustomer(customerId)
+      if (email) await upsertUser(email, { plan: 'free', key: '' })
+    }
   } else if (evt.type === 'customer.subscription.updated') {
     const sub = evt.data.object as Stripe.Subscription
     const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer?.id
     const priceId = sub.items.data[0]?.price?.id
     const tier = priceId ? tierForPriceId(priceId) : null
     if (customerId && tier && (sub.status === 'active' || sub.status === 'trialing')) {
-      await issueKey(customerId, tier)
+      await linkKeyToUser(customerId, tier)
     } else if (customerId && (sub.status === 'canceled' || sub.status === 'unpaid')) {
       await revokeCustomer(customerId)
+      const email = await userByCustomer(customerId)
+      if (email) await upsertUser(email, { plan: 'free', key: '' })
     }
   }
 

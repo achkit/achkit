@@ -1,8 +1,16 @@
 <script setup lang="ts">
 const tab = ref<'gen' | 'parse' | 'valid'>('gen')
+const authUser = useAuth()
+onMounted(refreshAuth)
 
 function copy(text: string) {
   if (import.meta.client && navigator.clipboard) navigator.clipboard.writeText(text)
+}
+
+// account before payment: send logged-out users to signup first
+function subscribe(tier: 'pro' | 'ultra') {
+  if (authUser.value) openCheckout(tier)
+  else navigateTo('/signup?plan=' + tier)
 }
 
 useSeoMeta({
@@ -36,7 +44,9 @@ defineOgImageComponent('Brand', {
           <a href="#usage">Docs</a>
           <a href="#pricing">Pricing</a>
           <a href="https://github.com/achkit/achkit">GitHub</a>
-          <a class="btn dark" href="#usage">Get the packages</a>
+          <NuxtLink v-if="authUser" to="/dashboard">Dashboard</NuxtLink>
+          <NuxtLink v-else to="/login">Sign in</NuxtLink>
+          <a class="btn dark round" href="#usage">Get the packages</a>
         </div>
       </div>
     </nav>
@@ -160,7 +170,7 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Hosted API + usage analytics</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>10,000 validations / mo</li>
             </ul>
-            <button class="btn dark" @click="openCheckout('pro')">Start on Pro</button>
+            <button class="btn dark" @click="subscribe('pro')">Start on Pro</button>
           </div>
           <div class="plan">
             <span class="nm">Ultra</span>
@@ -170,7 +180,7 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Return-file (R-code) monitoring + webhooks</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5" /></svg>Priority support</li>
             </ul>
-            <button class="btn ghost" @click="openCheckout('ultra')">Start on Ultra</button>
+            <button class="btn ghost" @click="subscribe('ultra')">Start on Ultra</button>
           </div>
         </div>
       </div>
@@ -188,7 +198,7 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
           </div>
           <div class="col"><h4>Product</h4><a href="#usage">Docs</a><a href="#pricing">Pricing</a><a href="https://github.com/achkit/achkit/releases">Changelog</a></div>
           <div class="col"><h4>Developers</h4><a href="https://github.com/achkit/achkit">GitHub</a><a href="https://www.npmjs.com/package/achkit">npm</a><a href="https://pypi.org/project/achkit/">PyPI</a><a href="/llms.txt">llms.txt</a></div>
-          <div class="col"><h4>Company</h4><a href="mailto:hello@achkit.com">Contact</a></div>
+          <div class="col"><h4>Company</h4><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div>
         </div>
         <div class="base">
           <span>(c) 2026 achkit</span>
