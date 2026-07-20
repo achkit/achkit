@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import * as THREE from 'three'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
 const host = useTemplateRef<HTMLDivElement>('host')
+const inst = getCurrentInstance()
 let raf = 0
 let ro: ResizeObserver | null = null
 let renderer: THREE.WebGLRenderer | null = null
@@ -13,7 +15,6 @@ onBeforeUnmount(() => {
   renderer = null
 })
 
-const inst = getCurrentInstance()
 onMounted(async () => {
   await nextTick()
   let el = host.value as HTMLDivElement | null
@@ -32,145 +33,146 @@ onMounted(async () => {
   const r = renderer
   r.setClearAlpha(0)
   r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+  r.toneMapping = THREE.ACESFilmicToneMapping
+  r.toneMappingExposure = 0.82
   el.appendChild(r.domElement)
 
   const scene = new THREE.Scene()
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100)
-  camera.position.set(0.6, 0.4, 15)
-  camera.lookAt(0, 0.2, 0)
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.72))
-  const key = new THREE.DirectionalLight(0xffffff, 1.5)
-  key.position.set(6, 10, 8)
+  // Studio image-based lighting - the single biggest driver of a premium look.
+  const pmrem = new THREE.PMREMGenerator(r)
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100)
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xbfbfbf, 0.32))
+  const key = new THREE.DirectionalLight(0xffffff, 1.55)
+  key.position.set(5, 9, 6)
   scene.add(key)
-  const rim = new THREE.DirectionalLight(0xffffff, 0.5)
-  rim.position.set(-8, 2, -6)
+  const rim = new THREE.DirectionalLight(0xffffff, 0.55)
+  rim.position.set(-7, 2, -5)
   scene.add(rim)
 
-  // Procedural face textures - concrete speckle + warm wood grain.
-  function tex(draw: (c: CanvasRenderingContext2D, s: number) => void) {
-    const s = 256
+  // Fine, low-contrast concrete + clean light-oak grain. Kept subtle so it reads
+  // as a cast material, not noise.
+  function canvasTex(draw: (c: CanvasRenderingContext2D, s: number) => void) {
+    const s = 512
     const cv = document.createElement('canvas')
     cv.width = cv.height = s
     const c = cv.getContext('2d')!
     draw(c, s)
     const t = new THREE.CanvasTexture(cv)
-    t.anisotropy = 4
+    t.anisotropy = 8
+    t.colorSpace = THREE.SRGBColorSpace
     return t
   }
-  const concrete = tex((c, s) => {
-    c.fillStyle = '#eceae4'; c.fillRect(0, 0, s, s)
-    for (let i = 0; i < 2600; i++) {
-      const g = 190 + Math.floor(Math.random() * 60)
-      c.fillStyle = `rgba(${g - 40},${g - 42},${g - 48},${Math.random() * 0.5})`
-      c.fillRect(Math.random() * s, Math.random() * s, 1.6, 1.6)
+  const concreteTex = canvasTex((c, s) => {
+    c.fillStyle = '#b4b0a7'; c.fillRect(0, 0, s, s)
+    const g = c.createRadialGradient(s * 0.35, s * 0.3, 0, s * 0.5, s * 0.5, s * 0.85)
+    g.addColorStop(0, 'rgba(214,211,204,0.5)'); g.addColorStop(1, 'rgba(126,122,114,0.45)')
+    c.fillStyle = g; c.fillRect(0, 0, s, s)
+    for (let i = 0; i < 7000; i++) {
+      const a = Math.random() * 0.13
+      c.fillStyle = Math.random() < 0.5 ? `rgba(96,92,84,${a})` : `rgba(255,255,255,${a})`
+      c.fillRect(Math.random() * s, Math.random() * s, 2, 2)
     }
   })
-  const wood = tex((c, s) => {
-    c.fillStyle = '#d9b489'; c.fillRect(0, 0, s, s)
-    for (let y = 0; y < s; y += 3) {
-      const w = 90 + Math.sin(y * 0.09) * 40
-      c.strokeStyle = `rgba(150,105,58,${0.10 + Math.random() * 0.16})`
-      c.lineWidth = 1 + Math.random() * 1.6
-      c.beginPath()
-      for (let x = 0; x <= s; x += 8) c.lineTo(x, y + Math.sin((x + y) * 0.03) * 3)
-      c.stroke()
-      w
+  const woodTex = canvasTex((c, s) => {
+    c.fillStyle = '#e2c39a'; c.fillRect(0, 0, s, s)
+    for (let x = 0; x < s; x += 2) {
+      const n = Math.sin(x * 0.05) + Math.sin(x * 0.013) * 1.6
+      c.strokeStyle = `rgba(178,132,80,${0.05 + Math.abs(Math.sin(x * 0.08)) * 0.14})`
+      c.lineWidth = 1 + Math.random()
+      c.beginPath(); c.moveTo(x + n, 0); c.lineTo(x + n, s); c.stroke()
     }
   })
-  const colorMat = (hex: number) => new THREE.MeshStandardMaterial({ color: hex, roughness: 0.55, metalness: 0 })
-  const concreteMat = new THREE.MeshStandardMaterial({ map: concrete, roughness: 0.92, metalness: 0 })
-  const woodMat = new THREE.MeshStandardMaterial({ map: wood, roughness: 0.7, metalness: 0 })
-  const COLORS = [0x35c956, 0xffe100, 0xff5db1, 0x22b8e6, 0xffffff, 0x2f2f2f]
 
-  // A layer: a wide rounded-ish block. Sides mostly concrete/wood, one accent
-  // band. Faces order: +x -x +y -y +z -z.
-  const geo = new THREE.BoxGeometry(3.4, 0.92, 2.3)
-  geo.translate(0, 0, 0)
-
-  function skin(): THREE.Material[] {
-    const base = Math.random() < 0.5 ? concreteMat : woodMat
-    const accent = colorMat(COLORS[Math.floor(Math.random() * COLORS.length)])
-    const band = Math.random() < 0.62
-    const wood2 = woodMat
-    return [
-      band ? accent : base,   // +x
-      Math.random() < 0.4 ? wood2 : base, // -x
-      Math.random() < 0.5 ? accent : concreteMat, // +y top
-      base,                   // -y
-      band ? base : accent,   // +z
-      base,                   // -z
-    ]
+  const concrete = new THREE.MeshStandardMaterial({ map: concreteTex, roughness: 0.9, metalness: 0, envMapIntensity: 0.35 })
+  const wood = new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.68, metalness: 0, envMapIntensity: 0.3 })
+  const COLORS = [0x25b247, 0xffcf14, 0xff4d9e, 0x149fd8, 0x1c1c1c]
+  const colorMats = COLORS.map((hex) => new THREE.MeshStandardMaterial({ color: hex, roughness: 0.45, metalness: 0, envMapIntensity: 0.4 }))
+  // Weighted so the totem always reads colourful: colour segments dominate, with
+  // concrete/wood as the neutral base. Never more than two neutrals in a row.
+  let neutralRun = 0
+  function pick() {
+    const forceColor = neutralRun >= 2
+    if (!forceColor && Math.random() < 0.42) {
+      neutralRun++
+      return Math.random() < 0.72 ? concrete : wood
+    }
+    neutralRun = 0
+    return colorMats[Math.floor(Math.random() * colorMats.length)]
   }
 
-  const LAYERS = 13
-  const H = 1.06
-  const totalH = LAYERS * H
+  // Chamfered hexagonal prisms - a compact totem, not grey bricks.
+  const RAD = 1.55
+  const HSEG = 0.86
+  const hexGeo = new THREE.CylinderGeometry(RAD, RAD, HSEG, 6, 1, false)
+
+  const LAYERS = 11
+  const totalH = LAYERS * HSEG
   const topY = totalH / 2
   const botY = -totalH / 2
   const tower = new THREE.Group()
   scene.add(tower)
-  const blocks: THREE.Mesh[] = []
+
+  type Seg = THREE.Mesh & { userData: { arm?: THREE.Mesh } }
+  const segs: Seg[] = []
+  function dressSeg(m: Seg) {
+    m.material = pick()
+    m.rotation.y = (Math.floor(Math.random() * 6)) * (Math.PI / 6)
+    // Occasionally sprout a hex "arm" jutting out, like the reference totem.
+    if (m.userData.arm) { tower.remove(m.userData.arm); m.userData.arm = undefined }
+    if (Math.random() < 0.28) {
+      const arm = new THREE.Mesh(hexGeo, Math.random() < 0.5 ? concrete : colorMats[Math.floor(Math.random() * colorMats.length)])
+      arm.scale.set(0.42, 1.9, 0.42)
+      arm.rotation.z = Math.PI / 2
+      const dir = Math.random() * Math.PI * 2
+      arm.position.set(Math.cos(dir) * (RAD + 1.2), 0, Math.sin(dir) * (RAD + 1.2))
+      arm.rotation.y = dir
+      m.add(arm)
+      m.userData.arm = arm
+    }
+  }
   for (let i = 0; i < LAYERS; i++) {
-    const m = new THREE.Mesh(geo, skin())
-    m.position.y = botY + i * H
-    m.rotation.y = (Math.random() - 0.5) * 0.5
-    m.position.x = (Math.random() - 0.5) * 0.5
-    m.userData.spin = m.rotation.y
-    blocks.push(m)
+    const m = new THREE.Mesh(hexGeo, concrete) as Seg
+    m.position.y = botY + i * HSEG
+    dressSeg(m)
+    segs.push(m)
     tower.add(m)
   }
 
-  // Floating accent cubes orbiting the tower.
-  const cubeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5)
-  const cubes: { m: THREE.Mesh; a: number; rad: number; yb: number }[] = []
-  for (let i = 0; i < 6; i++) {
-    const m = new THREE.Mesh(cubeGeo, colorMat(COLORS[i % COLORS.length]))
-    cubes.push({ m, a: Math.random() * Math.PI * 2, rad: 3.1 + Math.random() * 0.9, yb: (Math.random() - 0.5) * totalH * 0.8 })
-    scene.add(m)
-  }
-
-  let lastW = 0, lastH = 0
   function resize() {
-    const w = Math.round(el.clientWidth) || 1
-    const h = Math.round(el.clientHeight) || 1
-    if (w === lastW && h === lastH) return
-    lastW = w; lastH = h
+    const w = Math.round(el!.clientWidth) || 1
+    const h = Math.round(el!.clientHeight) || 1
     r.setSize(w, h, false)
     camera.aspect = w / h
-    // Frame the tall tower: pull camera back on portrait, closer on wide.
-    camera.position.z = 15 + Math.max(0, (h / w) - 1) * 6
+    // Frame the whole totem with margin so it never clips at the sides.
+    const visH = 7.0
+    const distV = (visH / 2) / Math.tan((camera.fov * Math.PI / 180) / 2)
+    const needW = (RAD + 2.4) * 2
+    const distH = (needW / 2) / (Math.tan((camera.fov * Math.PI / 180) / 2) * camera.aspect)
+    camera.position.set(0, 0.3, Math.max(distV, distH) + 1.2)
+    camera.lookAt(0, 0, 0)
     camera.updateProjectionMatrix()
   }
-  resize()
-  // Observe the grid cell (parent), never the canvas host, and coalesce to a
-  // frame so a resize can never feed back into another resize.
-  let roRaf = 0
-  ro = new ResizeObserver(() => { cancelAnimationFrame(roRaf); roRaf = requestAnimationFrame(resize) })
+  let lastW = 0, lastH = 0, roRaf = 0
+  function guardedResize() {
+    const w = Math.round(el!.clientWidth), h = Math.round(el!.clientHeight)
+    if (w === lastW && h === lastH) return
+    lastW = w; lastH = h; resize()
+  }
+  guardedResize()
+  ro = new ResizeObserver(() => { cancelAnimationFrame(roRaf); roRaf = requestAnimationFrame(guardedResize) })
   ro.observe(el.parentElement || el)
 
-  const DOWN = reduce ? 0 : 0.012
-  const SPIN = reduce ? 0 : 0.0035
+  const DOWN = reduce ? 0 : 0.0072
+  const SPIN = reduce ? 0 : 0.0022
   function frame() {
-    for (const m of blocks) {
+    for (const m of segs) {
       m.position.y -= DOWN
-      if (m.position.y < botY) {
-        m.position.y += totalH
-        m.material = skin() as THREE.Material[]
-        m.rotation.y = (Math.random() - 0.5) * 0.5
-        m.position.x = (Math.random() - 0.5) * 0.5
-      }
+      if (m.position.y < botY) { m.position.y += totalH; dressSeg(m) }
     }
     tower.rotation.y += SPIN
-    for (const c of cubes) {
-      c.a += SPIN * 1.4
-      c.m.position.set(Math.cos(c.a) * c.rad, c.yb, Math.sin(c.a) * c.rad)
-      c.m.position.y -= DOWN
-      if (c.m.position.y < botY) c.m.position.y = topY
-      else c.yb -= DOWN
-      c.m.rotation.x += 0.01
-      c.m.rotation.y += 0.012
-    }
     r.render(scene, camera)
     raf = requestAnimationFrame(frame)
   }
@@ -189,11 +191,8 @@ onMounted(async () => {
   height: 100%;
   min-height: 460px;
   overflow: hidden;
-  /* Fade the tower out at the bottom so it reads as endless. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 97%);
-  mask-image: linear-gradient(to bottom, #000 62%, transparent 97%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 66%, transparent 98%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 66%, transparent 98%);
 }
-/* Canvas is taken fully out of flow so its backing-store size can never feed
-   back into the grid row height (that loop made the hero pulse). */
 .tower :deep(canvas) { position: absolute; inset: 0; display: block; width: 100% !important; height: 100% !important; }
 </style>
