@@ -32,12 +32,17 @@ const records: Seg[][] = [
   [F('9', 1, 'type'), F('000012', 6, 'amt'), F('000002', 6, 'amt'), F('00000042', 8, 'amt'), F('0000984405', 10, 'amt', true), F('0000000000', 10, 'amt'), F('00000000', 8, 'amt'), F('', 39, 'dis')],
 ]
 
-const loop = [...records, ...records]
+// Repeat the base set enough that a single block always over-fills the panel,
+// then duplicate the block so the -50% scroll loops with no visible gap.
+const block = [...records, ...records, ...records]
+const loop = [...block, ...block]
 </script>
 
 <template>
   <div class="stream" aria-hidden="true">
     <div class="grid-lines" />
+    <div class="fade top" />
+    <div class="fade bottom" />
     <div class="track">
       <div v-for="(rec, i) in loop" :key="i" class="rec">
         <span class="ln">{{ String((i % records.length) + 1).padStart(2, '0') }}</span>
@@ -58,11 +63,15 @@ const loop = [...records, ...records]
   min-height: 460px;
   overflow: hidden;
   border-radius: 20px;
-  background:
-    radial-gradient(120% 80% at 70% 0%, #17181c 0%, #0c0d10 60%, #090a0c 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 11%, #000 82%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 11%, #000 82%, transparent 100%);
+  border: 1px solid rgba(255, 255, 255, .07);
+  background: linear-gradient(to bottom, #17181c 0%, #101115 55%, #0a0b0d 100%);
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, .5);
 }
+.fade {
+  position: absolute; left: 0; right: 0; height: 96px; z-index: 3; pointer-events: none;
+}
+.fade.top { top: 0; background: linear-gradient(to bottom, #17181c 8%, transparent); }
+.fade.bottom { bottom: 0; background: linear-gradient(to top, #0a0b0d 10%, transparent); }
 .grid-lines {
   position: absolute; inset: 0;
   background-image: linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
@@ -74,7 +83,7 @@ const loop = [...records, ...records]
   display: flex; flex-direction: column;
   padding: 24px 26px;
   gap: 13px;
-  animation: up 34s linear infinite;
+  animation: up 60s linear infinite;
   will-change: transform;
 }
 @keyframes up { to { transform: translateY(-50%); } }
@@ -112,7 +121,7 @@ const loop = [...records, ...records]
 @keyframes sweep { 0% { top: -14%; } 100% { top: 104%; } }
 
 .cap {
-  position: absolute; left: 22px; bottom: 18px;
+  position: absolute; left: 22px; bottom: 18px; z-index: 4;
   display: inline-flex; align-items: center; gap: 8px;
   font-family: var(--mono); font-size: 11px; letter-spacing: -.02em;
   color: #7f8790; text-transform: uppercase;
