@@ -196,7 +196,7 @@ ach = <span class="fn">parse</span>(open(<span class="st">'incoming.ach'</span>)
             <p style="font-size: 15px; color: var(--smoke); margin: 0 0 16px">The ACH file toolkit for developers. Ship NACHA files with confidence.</p>
             <p class="mailrow">hello <a href="mailto:hello@achkit.com">hello@achkit.com</a></p>
           </div>
-          <div class="col"><h4>Product</h4><a href="#usage">Docs</a><a href="#pricing">Pricing</a><a href="https://github.com/achkit/achkit/releases">Changelog</a></div>
+          <div class="col"><h4>Product</h4><a href="/docs">Docs</a><a href="#pricing">Pricing</a><a href="https://github.com/achkit/achkit/releases">Changelog</a></div>
           <div class="col"><h4>Developers</h4><a href="https://github.com/achkit/achkit">GitHub</a><a href="https://www.npmjs.com/package/achkit">npm</a><a href="https://pypi.org/project/achkit/">PyPI</a><a href="/llms.txt">llms.txt</a></div>
           <div class="col"><h4>Company</h4><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div>
         </div>
