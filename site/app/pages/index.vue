@@ -67,7 +67,7 @@ defineOgImageComponent('Brand', {
       </div>
     </section>
 
-    <section style="border-top:1px solid var(--ash)">
+    <section>
       <div class="wrap">
         <div class="sec-head">
           <span class="lbl">// In plain English</span>

@@ -78,9 +78,10 @@ onBeforeUnmount(stop)
 
 <style scoped>
 .story { background: var(--paper); border-radius: 32px; padding: 40px 32px 28px; }
-.stage { position: relative; height: 200px; }
-.scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; opacity: 0; transform: translateY(12px); transition: opacity .5s, transform .5s; pointer-events: none; }
-.scene.on { opacity: 1; transform: none; }
+.stage { display: flex; align-items: center; justify-content: center; min-height: 220px; overflow: hidden; }
+.scene { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; width: 100%; }
+.scene.on { display: flex; animation: sceneIn .5s ease; }
+@keyframes sceneIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 .intent-card { background: var(--canvas); border-radius: 18px; padding: 22px 28px; min-width: 300px; }
 .ic-row { display: flex; justify-content: space-between; gap: 24px; padding: 7px 0; font-family: var(--mono); font-size: 15px; }

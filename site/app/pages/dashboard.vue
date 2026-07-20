@@ -52,14 +52,38 @@ useSeoMeta({ title: 'Dashboard - achkit', robots: 'noindex' })
           </div>
         </div>
 
-        <div class="dcard" style="margin-top:20px">
-          <div class="lbl" style="color:var(--smoke)">Billing</div>
-          <div v-if="!paid" style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap">
-            <button class="btn dark" @click="openCheckout('pro')">Subscribe to Pro - $29/mo</button>
-            <button class="btn ghost" @click="openCheckout('ultra')">Ultra - $99/mo</button>
+        <div v-if="!paid" style="margin-top:32px">
+          <div class="lbl" style="color:var(--smoke);margin-bottom:16px">Choose a plan to get your API key</div>
+          <div class="ppgrid">
+            <div class="ppcard">
+              <div class="pp-nm">Pro</div>
+              <div class="pp-pr">$29<span>/mo</span></div>
+              <ul>
+                <li>Live routing verification vs FedACH</li>
+                <li>Always-current NACHA rules</li>
+                <li>10,000 validations / month</li>
+              </ul>
+              <button class="btn dark full" @click="openCheckout('pro')">Subscribe to Pro</button>
+            </div>
+            <div class="ppcard feat">
+              <div class="pp-nm">Ultra</div>
+              <div class="pp-pr">$99<span>/mo</span></div>
+              <ul>
+                <li>Everything in Pro</li>
+                <li>Unlimited validations</li>
+                <li>Return monitoring + webhooks</li>
+              </ul>
+              <button class="btn dark full" @click="openCheckout('ultra')">Subscribe to Ultra</button>
+            </div>
           </div>
-          <div v-else style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <p class="mono" style="font-size:12px;color:var(--smoke);margin-top:14px">Secure checkout by Stripe, right here - no redirect. Cancel anytime; plan changes are prorated.</p>
+        </div>
+
+        <div v-else class="dcard" style="margin-top:20px">
+          <div class="lbl" style="color:var(--smoke)">Billing - {{ user.plan.toUpperCase() }} plan</div>
+          <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
             <button v-if="user.plan === 'pro'" class="btn dark" @click="openCheckout('ultra')">Upgrade to Ultra (prorated)</button>
+            <button v-if="user.plan === 'ultra'" class="btn ghost" @click="openCheckout('pro')">Switch to Pro (prorated)</button>
             <button class="btn ghost" @click="cancel">Cancel subscription</button>
           </div>
         </div>
@@ -80,4 +104,16 @@ useSeoMeta({ title: 'Dashboard - achkit', robots: 'noindex' })
 .usage-n { font-family: var(--disp); font-size: 42px; margin: 14px 0 12px; letter-spacing: -.02em; }
 .bar { height: 10px; background: var(--mist); border-radius: 999px; overflow: hidden; }
 .bar-fill { height: 100%; background: var(--mint); border-radius: 999px; transition: width .4s; }
+.ppgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 720px) { .ppgrid { grid-template-columns: 1fr; } }
+.ppcard { background: var(--paper); border-radius: 24px; padding: 28px; display: flex; flex-direction: column; }
+.ppcard.feat { background: #000; color: #fff; }
+.pp-nm { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--smoke); }
+.pp-pr { font-family: var(--disp); font-size: 44px; letter-spacing: -.03em; margin: 12px 0 4px; }
+.pp-pr span { font-family: var(--sans); font-size: 15px; font-weight: 500; color: var(--smoke); }
+.ppcard ul { list-style: none; padding: 0; margin: 18px 0 24px; display: flex; flex-direction: column; gap: 9px; }
+.ppcard li { font-size: 14px; color: var(--slate); }
+.ppcard.feat li { color: var(--ash); }
+.ppcard .full { width: 100%; justify-content: center; }
+.ppcard.feat .btn.dark { background: var(--mint); color: #000; }
 </style>
