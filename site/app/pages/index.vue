@@ -52,7 +52,7 @@ defineOgImageComponent('Brand', {
           </div>
         </div>
 
-        <HeroTower />
+        <AchStream />
       </div>
     </header>
 
