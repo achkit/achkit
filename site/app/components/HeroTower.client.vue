@@ -130,9 +130,12 @@ onMounted(async () => {
     scene.add(m)
   }
 
+  let lastW = 0, lastH = 0
   function resize() {
-    const w = el.clientWidth || 1
-    const h = el.clientHeight || 1
+    const w = Math.round(el.clientWidth) || 1
+    const h = Math.round(el.clientHeight) || 1
+    if (w === lastW && h === lastH) return
+    lastW = w; lastH = h
     r.setSize(w, h, false)
     camera.aspect = w / h
     // Frame the tall tower: pull camera back on portrait, closer on wide.
@@ -140,8 +143,11 @@ onMounted(async () => {
     camera.updateProjectionMatrix()
   }
   resize()
-  ro = new ResizeObserver(resize)
-  ro.observe(el)
+  // Observe the grid cell (parent), never the canvas host, and coalesce to a
+  // frame so a resize can never feed back into another resize.
+  let roRaf = 0
+  ro = new ResizeObserver(() => { cancelAnimationFrame(roRaf); roRaf = requestAnimationFrame(resize) })
+  ro.observe(el.parentElement || el)
 
   const DOWN = reduce ? 0 : 0.012
   const SPIN = reduce ? 0 : 0.0035
@@ -182,9 +188,12 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   min-height: 460px;
+  overflow: hidden;
   /* Fade the tower out at the bottom so it reads as endless. */
   -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 97%);
   mask-image: linear-gradient(to bottom, #000 62%, transparent 97%);
 }
-.tower :deep(canvas) { display: block; width: 100% !important; height: 100% !important; }
+/* Canvas is taken fully out of flow so its backing-store size can never feed
+   back into the grid row height (that loop made the hero pulse). */
+.tower :deep(canvas) { position: absolute; inset: 0; display: block; width: 100% !important; height: 100% !important; }
 </style>
