@@ -24,6 +24,7 @@
     "@nuxtjs/sitemap": "^7.0.0",
     "@types/three": "^0.169.0",
     "nuxt-og-image": "^6.7.3",
+    "playwright": "^1.61.1",
     "satori": "^0.28.0"
   }
 }
