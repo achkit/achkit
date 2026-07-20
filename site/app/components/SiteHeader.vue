@@ -11,23 +11,25 @@ async function logout() {
 
 <template>
   <nav>
-    <div class="pill">
-      <NuxtLink class="brand" to="/">
-        <svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2.4"><rect x="3" y="6" width="26" height="20" rx="2" /><path d="M3 12h26" /><path d="M8 18h6M8 22h10" stroke-width="1.8" /></svg>achkit
-      </NuxtLink>
-      <div class="links">
-        <NuxtLink to="/docs">Docs</NuxtLink>
-        <NuxtLink to="/#pricing">Pricing</NuxtLink>
-        <a href="https://github.com/achkit/achkit">GitHub</a>
-        <template v-if="authUser">
-          <NuxtLink to="/dashboard">Dashboard</NuxtLink>
-          <button class="btn dark round" style="cursor:pointer" @click="logout">Sign out</button>
-        </template>
-        <template v-else>
-          <NuxtLink to="/login">Sign in</NuxtLink>
-          <NuxtLink class="btn dark round" to="/docs">Get the packages</NuxtLink>
-        </template>
-      </div>
+    <NuxtLink class="brand" to="/">
+      <svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2.4"><rect x="3" y="6" width="26" height="20" rx="2" /><path d="M3 12h26" /><path d="M8 18h6M8 22h10" stroke-width="1.8" /></svg>achkit
+    </NuxtLink>
+
+    <div class="navpill">
+      <NuxtLink to="/docs">Docs</NuxtLink>
+      <NuxtLink to="/#pricing">Pricing</NuxtLink>
+      <a href="https://github.com/achkit/achkit">GitHub</a>
+      <NuxtLink v-if="authUser" to="/dashboard">Dashboard</NuxtLink>
+    </div>
+
+    <div class="navcta">
+      <template v-if="authUser">
+        <button class="btn dark round" style="cursor:pointer" @click="logout">Sign out</button>
+      </template>
+      <template v-else>
+        <NuxtLink to="/login" class="signin">Sign in</NuxtLink>
+        <NuxtLink class="btn dark round" to="/docs">Get the packages</NuxtLink>
+      </template>
     </div>
   </nav>
 </template>
