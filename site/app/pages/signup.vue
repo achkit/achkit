@@ -26,7 +26,9 @@ useSeoMeta({ title: 'Create your achkit account', robots: 'noindex' })
       <div class="field"><label>Work email</label><input v-model="email" type="email" autocomplete="email" placeholder="you@company.com" required></div>
       <div class="field"><label>Password</label><input v-model="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required></div>
       <button class="btn dark full" :disabled="loading" type="submit">{{ loading ? 'Creating...' : 'Create account' }}</button>
-      <p style="font-size:14px;color:var(--slate);margin-top:18px">Use your work email, or <a href="/api/auth/google" style="text-decoration:underline">sign in with Google</a>. Already have an account? <NuxtLink to="/login" style="text-decoration:underline">Sign in</NuxtLink>.</p>
+      <div class="or">or</div>
+      <GoogleButton>Continue with Google</GoogleButton>
+      <p style="font-size:14px;color:var(--slate);margin-top:18px">Already have an account? <NuxtLink to="/login" style="text-decoration:underline">Sign in</NuxtLink>.</p>
     </form>
   </AuthShell>
 </template>

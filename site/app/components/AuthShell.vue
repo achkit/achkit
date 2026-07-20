@@ -31,4 +31,9 @@ defineProps<{ eyebrow?: string; title: string }>()
 :deep(.msg.err) { background: #ffe9e9; color: #c0392b; }
 :deep(.msg.ok) { background: var(--mint); color: #0a5a2f; }
 :deep(.full) { width: 100%; justify-content: center; }
+:deep(.or) { display: flex; align-items: center; gap: 14px; margin: 20px 0; color: var(--smoke); font-family: var(--mono); font-size: 12px; text-transform: uppercase; }
+:deep(.or)::before, :deep(.or)::after { content: ""; flex: 1; height: 1.5px; background: var(--ash); }
+:deep(.gbtn) { display: flex; width: 100%; align-items: center; justify-content: center; gap: 12px; background: var(--paper); border: 1.5px solid var(--ash); border-radius: 10px; padding: 14px 24px; font-family: var(--sans); font-weight: 500; font-size: 16px; cursor: pointer; transition: .15s; color: #000; }
+:deep(.gbtn:hover) { border-color: #000; }
+:deep(.gbtn svg) { width: 20px; height: 20px; }
 </style>

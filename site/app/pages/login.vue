@@ -27,7 +27,9 @@ useSeoMeta({ title: 'Sign in - achkit', robots: 'noindex' })
       <div class="field"><label>Email</label><input v-model="email" type="email" autocomplete="email" required></div>
       <div class="field"><label>Password</label><input v-model="password" type="password" autocomplete="current-password" required></div>
       <button class="btn dark full" :disabled="loading" type="submit">{{ loading ? 'Signing in...' : 'Sign in' }}</button>
-      <p style="font-size:14px;color:var(--slate);margin-top:18px"><a href="/api/auth/google" style="text-decoration:underline">Sign in with Google</a>. No account? <NuxtLink to="/signup" style="text-decoration:underline">Create one</NuxtLink>.</p>
+      <div class="or">or</div>
+      <GoogleButton />
+      <p style="font-size:14px;color:var(--slate);margin-top:18px">No account? <NuxtLink to="/signup" style="text-decoration:underline">Create one</NuxtLink>.</p>
     </form>
   </AuthShell>
 </template>
