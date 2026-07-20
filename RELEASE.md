@@ -9,14 +9,10 @@ Both packages ship from CI on a single GitHub Release. Never publish from a lapt
 - Add it to the repo: Settings -> Secrets and variables -> Actions -> `NPM_TOKEN`.
 - Provenance is enabled (`--provenance`); the repo must stay public.
 
-**PyPI** (`py/`) - trusted publishing, no token
-- On PyPI, add a Trusted Publisher for the `achkit` project:
-  - Owner: `achkit`
-  - Repository: `achkit`
-  - Workflow: `publish-pypi.yml`
-  - Environment: `pypi`
-- Create a repo Environment named `pypi` (Settings -> Environments) so the
-  workflow's `environment: pypi` matches. No secret required.
+**PyPI** (`py/`) - API token
+- Repo secret `PYPI_API_TOKEN` (account- or project-scoped token from PyPI).
+- The workflow passes it to `pypa/gh-action-pypi-publish`. Once the project
+  exists, narrow the token to project scope and rotate.
 
 ## Cutting a release
 
