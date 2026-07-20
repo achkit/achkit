@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-test/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+*.egg-info/
+py/dist/
+gen.mjs

@@ -1,0 +1,51 @@
+{
+  "name": "achkit",
+  "version": "0.1.0",
+  "description": "The ACH file toolkit for developers. Generate, parse and validate NACHA ACH files. Typed, zero-dependency.",
+  "keywords": [
+    "ach",
+    "nacha",
+    "ach-file",
+    "payments",
+    "banking",
+    "fintech",
+    "direct-deposit",
+    "eft",
+    "routing-number"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test dist-test/*.test.js",
+    "pretest": "tsc -p tsconfig.test.json",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^5.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/achkit/achkit.git",
+    "directory": "js"
+  },
+  "homepage": "https://achkit.com"
+}

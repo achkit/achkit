@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "achkit"
+version = "0.1.0"
+description = "The ACH file toolkit for developers. Generate, parse and validate NACHA ACH files. Typed, zero-dependency."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = ["ach", "nacha", "payments", "banking", "fintech", "direct-deposit", "eft", "routing-number"]
+authors = [{ name = "achkit" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Office/Business :: Financial",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://achkit.com"
+Repository = "https://github.com/achkit/achkit"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["achkit"]
