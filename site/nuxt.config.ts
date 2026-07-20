@@ -2,6 +2,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-01',
   ssr: true,
   modules: ['@nuxt/fonts', '@nuxtjs/sitemap', 'nuxt-og-image'],
+  build: { transpile: ['three'] },
+  vite: { optimizeDeps: { include: ['three'] } },
   css: ['~/assets/css/main.css'],
   site: { url: 'https://achkit.com', name: 'achkit' },
   ogImage: {

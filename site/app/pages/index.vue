@@ -90,6 +90,8 @@ defineOgImageComponent('Brand', {
       </div>
     </section>
 
+    <WhereItFits />
+
     <section id="problem">
       <div class="wrap">
         <div class="inv">
