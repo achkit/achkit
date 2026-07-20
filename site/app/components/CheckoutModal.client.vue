@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.ck-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.55); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+.ck-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; padding: 40px 16px; overflow-y: auto; }
 .ck-panel { position: relative; background: #fff; border-radius: 24px; width: 100%; max-width: 560px; padding: 44px 20px 20px; min-height: 120px; }
 .ck-close { position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border: none; background: var(--mist); border-radius: 8px; cursor: pointer; color: #000; display: flex; align-items: center; justify-content: center; }
 .ck-close svg { width: 18px; height: 18px; }
